@@ -85,6 +85,26 @@ def display(board):
     return output
 
 
+def reach(pos1, pos2):
+    """ Given two positions (row, col), calculates the third on the board to make
+    a line out of the three positions.
+    """
+    if pos1[0] == pos2[0]:
+        return (pos1[0], 3 - (pos1[1] + pos2[1]))
+    elif pos1[1] == pos2[1]:
+        return (3 - (pos1[0] + pos2[0]), pos1[1])
+    else:
+        # Diagonal incomplete ATM
+        return (1, 1)
+
+
+def reachExists(board, piece):
+    """ Given a board, returns Boolean on whether there is a reach for the given player
+    """
+    # Incomplete
+    return False
+    
+
 def main():
     """ 
     1. Bot will always play O. Player will always play X
