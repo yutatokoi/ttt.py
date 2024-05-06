@@ -86,14 +86,32 @@ def display(board):
 
 
 def main():
+    """ 
+    1. Bot will always play O. Player will always play X
+    """
+    
+    # Determine if the player or bot will start
+    starter = input("Would you like to be the first player (Y or N): ")
+    while True:
+        try:
+            assert(starter == "Y" or starter == "N")
+            break
+        except Exception:
+            starter = input("Would you like to be the first player (Y or N): ")
+
+    if starter == "N":
+        place(board, 1, 1, "O")
+        display(board)
+
+    # Loop game state while the game can continue
     while not winner(board) and not full(board):
         print(display(board))
-        piece = input("Choose piece to place: ")
         row = int(input("Choose row to place in: "))
         col = int(input("Choose column to place in: "))
         
-        place(board, row, col, piece)
+        place(board, row, col, 'X')
     
+    # Declare the winner, or declare the board full
     if winner(board):
         print(display(board))
         print(f'The winner is: {winner(board)} 🎉')
