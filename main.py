@@ -1,3 +1,7 @@
+import math
+
+# Existing code
+
 board = [["", "", ""], 
          ["", "", ""], 
          ["", "", ""]]
@@ -5,13 +9,19 @@ board = [["", "", ""],
 ROWS = len(board)
 COLS = len(board[0])
 
+POSDIAG = []
+NEGDIAG = []
+
+for i in range(ROWS):
+    POSDIAG.append((i, i))
+    NEGDIAG.append((i, ROWS - 1 - i))
+
 def place(board, row, col, piece):
     if board[row][col]:
         return board
     else:
         board[row][col] = piece
         return board
-
 
 def winner(board):
     """ Given a board, if a winner exists, return the piece of the winner.
@@ -53,7 +63,6 @@ def winner(board):
     # No winners
     return None
 
-
 def full(board):
     """ Given a board, return True if full, else False.
     """
@@ -62,7 +71,6 @@ def full(board):
             if not board[row][col]:
                 return False
     return True
-
 
 def display(board):
     """ Given a board, returns the string representation of the board
@@ -84,6 +92,48 @@ def display(board):
 
     return output
 
+def minimax(board, depth, is_maximizing):
+    if winner(board) == 'X':
+        return -10 + depth
+    elif winner(board) == 'O':
+        return 10 - depth
+    elif full(board):
+        return 0
+
+    if is_maximizing:
+        best_score = -math.inf
+        for row in range(ROWS):
+            for col in range(COLS):
+                if board[row][col] == "":
+                    board[row][col] = 'O'
+                    score = minimax(board, depth + 1, False)
+                    board[row][col] = ""
+                    best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = math.inf
+        for row in range(ROWS):
+            for col in range(COLS):
+                if board[row][col] == "":
+                    board[row][col] = 'X'
+                    score = minimax(board, depth + 1, True)
+                    board[row][col] = ""
+                    best_score = min(score, best_score)
+        return best_score
+
+def best_move(board):
+    best_score = -math.inf
+    move = None
+    for row in range(ROWS):
+        for col in range(COLS):
+            if board[row][col] == "":
+                board[row][col] = 'O'
+                score = minimax(board, 0, False)
+                board[row][col] = ""
+                if score > best_score:
+                    best_score = score
+                    move = (row, col)
+    return move
 
 def reach(pos1, pos2):
     """ Given two positions (row, col), calculates the third on the board to make
@@ -97,14 +147,12 @@ def reach(pos1, pos2):
         # Diagonal incomplete ATM
         return (1, 1)
 
-
 def reachExists(board, piece):
     """ Given a board, returns Boolean on whether there is a reach for the given player
     """
     # Incomplete
     return False
     
-
 def main():
     """ 
     1. Bot will always play O. Player will always play X
@@ -120,8 +168,10 @@ def main():
             starter = input("Would you like to be the first player (Y or N): ")
 
     if starter == "N":
-        place(board, 1, 1, "O")
-        display(board)
+        move = best_move(board)
+        if move:
+            place(board, move[0], move[1], "O")
+        print(display(board))
 
     # Loop game state while the game can continue
     while not winner(board) and not full(board):
@@ -130,6 +180,11 @@ def main():
         col = int(input("Choose column to place in: "))
         
         place(board, row, col, 'X')
+        
+        if not winner(board) and not full(board):
+            move = best_move(board)
+            if move:
+                place(board, move[0], move[1], "O")
     
     # Declare the winner, or declare the board full
     if winner(board):
@@ -141,7 +196,5 @@ def main():
     
     return None
 
-
 main()
-
 
